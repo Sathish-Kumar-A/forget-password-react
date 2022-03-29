@@ -1,9 +1,13 @@
 import React,{useState} from 'react';
 import { Form, Button } from 'react-bootstrap';
+import { link } from "../config";
+import * as axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import "./register.css";
+import { toast,ToastContainer } from 'react-toastify';
 
 export const Register = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [formInput, setFormInput] = useState({
         email: "",
       password: "",
@@ -12,9 +16,32 @@ export const Register = () => {
     const handleChange = (e) => {
         let name = e.target.name;
         setFormInput({ ...formInput, [name]: e.target.value });
+  }
+  const createUser = async () => {
+    if (formInput["password"] === formInput["password2"]) {
+      const body = {
+      email: formInput['email'],
+      password:formInput['password']
     }
+    await axios.post(link + "register", body).then(({ data }) => {
+      if (data["success"]) {
+        toast.success(data['message']);
+        setTimeout(()=>navigate("/"),2000)
+      }
+    })
+      .catch(err => {
+        const { data } = err.response;
+        toast.error(data["message"]);
+    })
+    }
+    else {
+      toast.error("Passwords doesn't match");
+    }
+  }
   return (
-      <Form className='d-flex flex-column '>
+    <div className='register-wrapper'>
+      <ToastContainer />
+      <Form className='d-flex flex-column register-inner p-5'>
           <Form.Group className='mb-3'>
               <Form.Label>Email</Form.Label>
               <Form.Control type='email' placeholder='enter your email' name="email" onChange={handleChange} value={formInput["email"]}/>
@@ -27,12 +54,13 @@ export const Register = () => {
           </Form.Group>
           <Form.Group className='mb-3'>
               <Form.Label>Confirm Password</Form.Label>
-              <Form.Control type="password" placeholder='re-enter password' name="password2" onChange={handleChange} value={formInput["password"]}/>
+              <Form.Control type="password" placeholder='re-enter password' name="password2" onChange={handleChange} value={formInput["password2"]}/>
           </Form.Group>
           <Form.Group>
-          <Button variant="success" className='mx-3'>Submit</Button>
+          <Button variant="success" className='mx-3' onClick={createUser}>Submit</Button>
             <Button variant='primary' onClick={()=>navigate("/")}>Already a user?</Button>
             </Form.Group>
-    </Form>
+      </Form>
+      </div>
   )
 }
