@@ -12,7 +12,7 @@ export const FP = () => {
   const [token, setToken] = useState("");
 
   const tokenCheck = async () => {
-    const body = { token: token };
+    const body = { token: token,email:email };
     await axios.put(link+"entertoken", body).then(({data}) => {
       if (data["success"]) {
         navigate("/newpassword",{state:{email:email}});
