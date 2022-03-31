@@ -5,9 +5,11 @@ import * as axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import "./register.css";
 import { toast,ToastContainer } from 'react-toastify';
+import { Loading } from '../Loading/Loading';
 
 export const Register = () => {
   const navigate = useNavigate();
+  const [spinner, setSpinner] = useState(false);
   const [formInput, setFormInput] = useState({
         email: "",
       password: "",
@@ -19,6 +21,7 @@ export const Register = () => {
   }
   const createUser = async () => {
     if (formInput["password"] === formInput["password2"]) {
+      setSpinner(true);
       const body = {
       email: formInput['email'],
       password:formInput['password']
@@ -32,6 +35,7 @@ export const Register = () => {
       .catch(err => {
         const { data } = err.response;
         toast.error(data["message"]);
+        setSpinner(false);
     })
     }
     else {
@@ -41,7 +45,7 @@ export const Register = () => {
   return (
     <div className='register-wrapper'>
       <ToastContainer />
-      <Form className='d-flex flex-column register-inner p-5'>
+      {!spinner?<Form className='d-flex flex-column register-inner p-5'>
           <Form.Group className='mb-3'>
               <Form.Label>Email</Form.Label>
               <Form.Control type='email' placeholder='enter your email' name="email" onChange={handleChange} value={formInput["email"]}/>
@@ -60,7 +64,7 @@ export const Register = () => {
           <Button variant="success" className='mx-3' onClick={createUser}>Submit</Button>
             <Button variant='primary' onClick={()=>navigate("/")}>Already a user?</Button>
             </Form.Group>
-      </Form>
+      </Form>:<Loading />}
       </div>
   )
 }

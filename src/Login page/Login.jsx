@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import * as axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { link } from "../config";
+import { Loading } from '../Loading/Loading';
 
 
 export const Login = () => {
@@ -12,7 +13,8 @@ export const Login = () => {
     const [formInput, setFormInput] = useState({
         email: "",
         password: ""
-    })
+    });
+    const [spinner, setSpinner] = useState(false);
     const emailRef = useRef("");
     const handleChange = (e) => {
         let name = e.target.name;
@@ -35,17 +37,12 @@ export const Login = () => {
                     toast.error("Invalid Credentials");
                 }
             })
-        // console.log(data);
-        // if (data["success"]) {
-        //     toast.success("Logged in successfully");
-        // else {
-        //     toast.error("Invalid credentials");
-        // }
     }
     const sendEmail = async () => {
         if (emailRef.current.value.length > 7 && emailRef.current.value.includes("@")) {
+            setSpinner(true);
             const body={email:formInput['email']}
-        await axios.put(link + "sendmail", body).then(({ data }) => {
+            await axios.put(link + "sendmail", body).then(({ data }) => {
             toast.success("The secret key has been sent to your mail");
         })
             .catch(err => {
@@ -62,7 +59,7 @@ export const Login = () => {
     return (
         <div className='register-wrapper' >
             <ToastContainer />
-      <Form className='d-flex flex-column register-inner p-5'>
+     { !spinner?<Form className='d-flex flex-column register-inner p-5'>
           <Form.Group className='mb-3'>
               <Form.Label>Email</Form.Label>
                     <Form.Control type='email' placeholder='enter your email' name="email" onChange={handleChange} value={formInput["email"]} ref={emailRef}/>
@@ -78,7 +75,7 @@ export const Login = () => {
               <Button variant='warning' className='mx-2' onClick={sendEmail}>Forgot password ?</Button>
               <Button variant='info' className='mx-3' onClick={()=>navigate("/register")}>New user?</Button>
             </Form.Group>
-            </Form>
+            </Form> : <Loading />}
             </div>
   )
 }
